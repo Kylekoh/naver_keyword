@@ -20,8 +20,9 @@ class Form extends Component {
     super();
     this.generateHMAC = this.generateHMAC.bind(this);
     this.state = {
+      keywordLists: '',
     }
-  }  
+  }
 
   generateHMAC = (clientKey) => {
     const method = "GET";
@@ -48,15 +49,20 @@ class Form extends Component {
         "hintKeywords" : "주식투자",              
       }
     })
-    .then(function(response) {
-      console.log(response.data.keywordList)
+    .then((response) => {
+      const keywordLists = response.data.keywordList;
+      this.setState({ keywordLists })
     })    
   } 
 
   render() {
     return (
       <div>
-        Form
+        <ol className="keywordList-wrapper">
+        {this.state.keywordLists && this.state.keywordLists.map((keyword, id) => 
+          <li key={id} className="keywordList">{keyword.relKeyword}</li>
+        )}
+        </ol>
       </div>
     );
   }
