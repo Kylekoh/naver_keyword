@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import styles from './Form.scss';
 import axios from 'axios';
+import KeywordList from '../KeywordList'
 
 const crypto = require('crypto');
 // import personal information from .env file.
@@ -21,6 +21,8 @@ class Form extends Component {
     this.generateHMAC = this.generateHMAC.bind(this);
     this.state = {
       keywordLists: '',
+      isLoading: true,
+      isError: true,
     }
   }
 
@@ -51,18 +53,25 @@ class Form extends Component {
     })
     .then((response) => {
       const keywordLists = response.data.keywordList;
-      this.setState({ keywordLists })
-    })    
+      this.setState({ 
+        keywordLists, 
+        isLoading: false,
+      })
+    })
+    .catch(err => this.setState({ 
+      isError: false, 
+      isLoading: false 
+    }));
   } 
 
   render() {
     return (
       <div>
-        <ol className="keywordList-wrapper">
-        {this.state.keywordLists && this.state.keywordLists.map((keyword, id) => 
-          <li key={id} className="keywordList">{keyword.relKeyword}</li>
-        )}
-        </ol>
+        <KeywordList 
+          keywordLists={this.state.keywordLists}
+          isLoading={this.state.isLoading}
+          isError={this.state.isError}
+        />
       </div>
     );
   }
