@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import axios from 'axios';
 import KeywordList from '../KeywordList'
 
@@ -20,9 +20,20 @@ class Form extends Component {
     super();
     this.generateHMAC = this.generateHMAC.bind(this);
     this.state = {
-      keywordLists: '',
+      keywordLists: [{
+        relKeyword: '',
+        monthlyPcQcCnt: '',
+        monthlyMobileQcCnt: '',
+        monthlyAvePcClkCnt: '',
+        monthlyAveMobileClkCnt: '',
+        monthlyAvePcCtr: '',
+        monthlyAveMobileCtr: '',
+        compIdx: '',
+        plAvgDepth: ''
+      }],
       isLoading: true,
       isError: true,
+      word: ''
     }
   }
 
@@ -37,6 +48,51 @@ class Form extends Component {
   }
 
   componentDidMount = () => {
+    // axios.get('https://cors-anywhere.herokuapp.com/https://api.naver.com/keywordstool', {
+    //   headers: {
+    //     'X-API-KEY': api_key,
+    //     'X-Customer': client_num,
+    //     'X-Timestamp': time_stamp,
+    //     'X-Signature': this.generateHMAC(client_key),
+    //     'Content-Type': 'application/json',
+    //   },
+    //   params: {
+    //     "includeHintKeywords" : 0,
+    //     "showDetail" : 1,
+    //     "hintKeywords" : "주식투자",              
+    //   }
+    // })
+    // .then((response) => {
+    //   const keywordLists = response.data.keywordList.map(keyword => ({
+    //     relKeyword: keyword.relKeyword,
+    //     monthlyPcQcCnt: keyword.monthlyPcQcCnt,
+    //     monthlyMobileQcCnt: keyword.monthlyMobileQcCnt,
+    //     monthlyAvePcClkCnt: keyword.monthlyAvePcClkCnt,
+    //     monthlyAveMobileClkCnt: keyword.monthlyAveMobileClkCnt,
+    //     monthlyAvePcCtr: keyword.monthlyAvePcCtr,
+    //     monthlyAveMobileCtr: keyword.monthlyAveMobileCtr,
+    //     compIdx: keyword.compIdx,        
+    //     plAvgDepth: keyword.plAvgDepth
+    //   }));
+    //   this.setState({ 
+    //     keywordLists, 
+    //     isLoading: false,
+    //   })
+    // })
+    // .catch(err => this.setState({ 
+    //   isError: false, 
+    //   isLoading: false 
+    // }));
+  }
+
+  handleChange = (event) => {
+    this.setState({
+      word: event.target.value 
+    })
+  }
+
+  handleSubmit = (event) => {
+    event.preventDefault();
     axios.get('https://cors-anywhere.herokuapp.com/https://api.naver.com/keywordstool', {
       headers: {
         'X-API-KEY': api_key,
@@ -48,11 +104,21 @@ class Form extends Component {
       params: {
         "includeHintKeywords" : 0,
         "showDetail" : 1,
-        "hintKeywords" : "주식투자",              
+        "hintKeywords" : `${this.state.word}`,              
       }
     })
     .then((response) => {
-      const keywordLists = response.data.keywordList;
+      const keywordLists = response.data.keywordList.map(keyword => ({
+        relKeyword: keyword.relKeyword,
+        monthlyPcQcCnt: keyword.monthlyPcQcCnt,
+        monthlyMobileQcCnt: keyword.monthlyMobileQcCnt,
+        monthlyAvePcClkCnt: keyword.monthlyAvePcClkCnt,
+        monthlyAveMobileClkCnt: keyword.monthlyAveMobileClkCnt,
+        monthlyAvePcCtr: keyword.monthlyAvePcCtr,
+        monthlyAveMobileCtr: keyword.monthlyAveMobileCtr,
+        compIdx: keyword.compIdx,        
+        plAvgDepth: keyword.plAvgDepth
+      }));
       this.setState({ 
         keywordLists, 
         isLoading: false,
@@ -62,17 +128,27 @@ class Form extends Component {
       isError: false, 
       isLoading: false 
     }));
-  } 
+    
+  }
 
   render() {
+    const { keywordLists, isLoading, isError } = this.state;
+    console.log(keywordLists);
     return (
-      <div>
+      <Fragment> 
+        <form onSubmit={this.handleSubmit}>
+          <label>
+            검색어:
+            <input type="text" name="keyword" onChange={this.handleChange} />
+          </label>
+          <input type="submit" value="Submit" />
+        </form>
         <KeywordList 
-          keywordLists={this.state.keywordLists}
-          isLoading={this.state.isLoading}
-          isError={this.state.isError}
+          keywordLists={keywordLists}
+          isLoading={isLoading}
+          isError={isError}
         />
-      </div>
+      </Fragment>
     );
   }
 }

@@ -1,12 +1,14 @@
 import React, { Component, Fragment } from 'react';
 import styles from './KeywordList.scss';
 import ReactTable from "react-table";
+import 'react-table/react-table.css';
+
 
 
 class KeywordList extends Component {
   render() {
     const { keywordLists, isLoading, isError } = this.props
-    const { data } = keywordLists;
+    const data = this.props.keywordLists;
     const columns = [
       {
         Header: '연관키워드',
@@ -21,7 +23,7 @@ class KeywordList extends Component {
           },
           {
             Header: '모바일',
-            accessor: 'monthlyPcQcCnt'
+            accessor: 'monthlyMobileQcCnt'
           },
         ]
       },
@@ -58,9 +60,11 @@ class KeywordList extends Component {
       {
         Header: '월평균광고노출수',
         accessor: 'plAvgDepth'
-      },  
-    ]
-    console.log(data)
+      }
+  ]
+ 
+    console.log(this.props.keywordLists)
+    console.log(data);
     return (
       <Fragment>
       {
